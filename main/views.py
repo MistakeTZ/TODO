@@ -6,9 +6,7 @@ from .tasks import get_tasks
 
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
-        context = {
-            'tasks': get_tasks(request.user)
-        }
+        context = get_tasks(request.user)
         return render(request, 'main/index.html', context)
     else:
         return redirect('login')

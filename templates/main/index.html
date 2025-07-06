@@ -11,7 +11,21 @@
         {% for task in tasks %}
             <form action="{% url 'edit_task' task.id %}" method="post">
                 {% csrf_token %}
-                <input type="checkbox" name="completed" value="True" {% if task.completed %} checked {% endif %} onchange="this.form.submit()">
+                <input type="checkbox" name="completed" value="True" onchange="this.form.submit()">
+                <input type="text" name="title" value="{{ task.title }}" required>
+                <button type="submit" name="edit">Edit</button>
+                <button type="submit" name="delete">Delete</button>
+            </form>
+            <li>{{ task.title }}
+                {% if task.description %}: {{ task.description }}{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    <ul>
+        {% for task in completed %}
+            <form action="{% url 'edit_task' task.id %}" method="post">
+                {% csrf_token %}
+                <input type="checkbox" name="completed" value="True" checked onchange="this.form.submit()">
                 <input type="text" name="title" value="{{ task.title }}" required>
                 <button type="submit" name="edit">Edit</button>
                 <button type="submit" name="delete">Delete</button>
