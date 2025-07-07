@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
+from django.utils import timezone as tz
 from .models import Task, Rights
 from .tasks import get_tasks, add_right
 
@@ -42,10 +43,11 @@ def edit_task(request: HttpRequest, task_id: int) -> HttpResponse:
             task.title = title
             task.save()
 
-        completed = request.POST.get('completed', 'False')
+        completed = request.POST.get('completed', 'False') == 'True'
+        task.completed = completed
         if completed:
-            task.completed = completed == 'True'
-            task.save()
+            task.completed_at = tz.now()
+        task.save()
 
     return redirect('index')
 
