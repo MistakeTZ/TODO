@@ -44,7 +44,11 @@ def get_tasks(user: User) -> List[Task]:
 
 
 def add_right(task: Task, username: str, can_edit: bool, can_view: bool):
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+        Rights.objects.create(task=task, user=user, can_edit=can_edit, can_view=can_view)
+    except User.DoesNotExist:
+        return False
 
     if not can_view:
         Rights.objects.filter(user=user, task=task).delete()
