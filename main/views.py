@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from .models import Task, Rights
-from .tasks import get_tasks
+from .tasks import get_tasks, add_right
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -31,9 +31,10 @@ def edit_task(request: HttpRequest, task_id: int) -> HttpResponse:
             if not Rights.objects.filter(user=request.user,
                         task=task, can_edit=True).exists():
                 return redirect('index')
-        
+
         if 'delete' in request.POST:
-            task.delete()
+            if task.user == request.user:
+                task.delete()
             return redirect('index')
 
         title = request.POST.get('title')
@@ -45,5 +46,18 @@ def edit_task(request: HttpRequest, task_id: int) -> HttpResponse:
         if completed:
             task.completed = completed == 'True'
             task.save()
-    
+
+    return redirect('index')
+
+
+def add_rights(request: HttpRequest, task_id: int) -> HttpResponse:
+    if request.method == 'POST':
+        task = Task.objects.get(id=task_id)
+        if task.user != request.user:
+            return redirect('index')
+
+        add_right(task, request.POST.get('user'),
+                   request.POST.get('can_edit', 'False') == 'True',
+                   request.POST.get('can_view', 'False') == 'True')
+
     return redirect('index')

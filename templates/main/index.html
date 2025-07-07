@@ -7,40 +7,118 @@
     <title>Document</title>
 </head>
 <body>
-    <ul>
-        {% for task in tasks %}
-            <form action="{% url 'edit_task' task.id %}" method="post">
-                {% csrf_token %}
-                <input type="checkbox" name="completed" value="True" onchange="this.form.submit()">
-                <input type="text" name="title" value="{{ task.title }}" required>
-                <button type="submit" name="edit">Edit</button>
-                <button type="submit" name="delete">Delete</button>
-            </form>
-            <li>{{ task.title }}
-                {% if task.description %}: {{ task.description }}{% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <ul>
-        {% for task in completed %}
-            <form action="{% url 'edit_task' task.id %}" method="post">
-                {% csrf_token %}
-                <input type="checkbox" name="completed" value="True" checked onchange="this.form.submit()">
-                <input type="text" name="title" value="{{ task.title }}" required>
-                <button type="submit" name="edit">Edit</button>
-                <button type="submit" name="delete">Delete</button>
-            </form>
-            <li>{{ task.title }}
-                {% if task.description %}: {{ task.description }}{% endif %}
-            </li>
-        {% endfor %}
-    </ul>
 
-    <form action="{% url 'add_task' %}" method="post">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="Title" required>
-        <!-- <input type="text" name="description" placeholder="Description"> -->
-        <button type="submit">Add Task</button>
-    </form>
+<datalist id="users">
+    {% for user in users %}
+        <option value="{{ user.username }}"></option>
+    {% endfor %}
+</datalist>
+
+<ul>
+    {% for item in tasks %}
+        {% with task=item.task allow=item.rights %}
+            <li>
+                {{ task.title }}
+
+                <form action="{% url 'edit_task' task.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="checkbox" name="completed" value="True" onchange="this.form.submit()">
+                    <input type="text" name="title" value="{{ task.title }}" required>
+                    <button type="submit" name="edit">Edit</button>
+                    <button type="submit" name="delete">Delete</button>
+                </form>
+
+                {% if allow %}
+                    {% for user in allow %}
+                        <form action="{% url 'add_rights' task.id %}" method="post">
+                            {% csrf_token %}
+                            {{ user.user.username }}
+                            <input type="hidden" name="user" value="{{ user.user.username }}">
+                            Can view <input type="checkbox" name="can_view" value="True" {% if user.can_view %}checked{% endif %}>
+                            Can edit <input type="checkbox" name="can_edit" value="True" {% if user.can_edit %}checked{% endif %}>
+                            <button type="submit">Add rights</button>
+                        </form>
+                    {% endfor %}
+                {% endif %}
+
+                <form action="{% url 'add_rights' task.id %}" method="post">
+                    {% csrf_token %}
+                    <input name="user" list="users" placeholder="Username">
+                    Can view <input type="checkbox" name="can_view" value="True" checked>
+                    Can edit <input type="checkbox" name="can_edit" value="True" checked>
+                    <button type="submit">Add rights</button>
+                </form>
+            </li>
+        {% endwith %}
+    {% endfor %}
+</ul>
+
+<ul>
+    {% for item in completed %}
+        {% with task=item.task allow=item.rights %}
+            <li>
+                {{ task.title }}
+
+                <form action="{% url 'edit_task' task.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="checkbox" name="completed" value="True" onchange="this.form.submit()" checked>
+                    <input type="text" name="title" value="{{ task.title }}" required>
+                    <button type="submit" name="edit">Edit</button>
+                    <button type="submit" name="delete">Delete</button>
+                </form>
+
+                {% if allow %}
+                    {% for user in allow %}
+                        <form action="{% url 'add_rights' task.id %}" method="post">
+                            {% csrf_token %}
+                            {{ user.user.username }}
+                            <input type="hidden" name="user" value="{{ user.user.username }}">
+                            Can view <input type="checkbox" name="can_view" value="True" {% if user.can_view %}checked{% endif %}>
+                            Can edit <input type="checkbox" name="can_edit" value="True" {% if user.can_edit %}checked{% endif %}>
+                            <button type="submit">Add rights</button>
+                        </form>
+                    {% endfor %}
+                {% endif %}
+
+                <form action="{% url 'add_rights' task.id %}" method="post">
+                    {% csrf_token %}
+                    <input name="user" list="users" placeholder="Username">
+                    Can view <input type="checkbox" name="can_view" value="True" checked>
+                    Can edit <input type="checkbox" name="can_edit" value="True" checked>
+                    <button type="submit">Add rights</button>
+                </form>
+            </li>
+        {% endwith %}
+    {% endfor %}
+</ul>
+
+<ul>
+    {% for user, right in rights.items %}
+        <li>{{ user }}
+            <ul>
+                {% for task in right %}
+                    <li>
+                        {{ task.task.title }}
+                        {% if task.can_edit %}
+                            <form action="{% url 'edit_task' task.task.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="checkbox" name="completed" value="True" checked onchange="this.form.submit()">
+                                <input type="text" name="title" value="{{ task.task.title }}" required>
+                                <button type="submit" name="edit">Edit</button>
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+</ul>
+
+<form action="{% url 'add_task' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="Title" required>
+    <!-- <input type="text" name="description" placeholder="Description"> -->
+    <button type="submit">Add Task</button>
+</form>
 </body>
 </html>
