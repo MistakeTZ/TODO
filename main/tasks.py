@@ -3,6 +3,7 @@ from typing import List
 from django.contrib.auth.models import User
 
 
+# Get all tasks for user
 def get_tasks(user: User) -> List[Task]:
     tasks = []
     for task in Task.objects.filter(user=user,
@@ -22,6 +23,7 @@ def get_tasks(user: User) -> List[Task]:
             'rights': rights
         })
 
+    # Get users for adding rights
     users = User.objects.exclude(username=user.username).all()
     
     rights = Rights.objects.filter(user=user)
@@ -43,6 +45,7 @@ def get_tasks(user: User) -> List[Task]:
     return context
 
 
+# Add right to user
 def add_right(task: Task, username: str, can_edit: bool, can_view: bool):
     try:
         user = User.objects.get(username=username)

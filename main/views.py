@@ -5,6 +5,7 @@ from .models import Task, Rights
 from .tasks import get_tasks, add_right
 
 
+# Default page
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated:
         context = get_tasks(request.user)
@@ -13,6 +14,7 @@ def index(request: HttpRequest) -> HttpResponse:
         return redirect('login')
 
 
+# New task
 def add_task(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -25,6 +27,7 @@ def add_task(request: HttpRequest) -> HttpResponse:
     return redirect('index')
 
 
+# Edit task
 def edit_task(request: HttpRequest, task_id: int) -> HttpResponse:
     if request.method == 'POST':
         task = Task.objects.get(id=task_id)
@@ -52,6 +55,7 @@ def edit_task(request: HttpRequest, task_id: int) -> HttpResponse:
     return redirect('index')
 
 
+# Add rights for task
 def add_rights(request: HttpRequest, task_id: int) -> HttpResponse:
     if request.method == 'POST':
         task = Task.objects.get(id=task_id)

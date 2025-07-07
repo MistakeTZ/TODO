@@ -6,7 +6,7 @@ from django.contrib.messages import add_message, constants
 from django.shortcuts import redirect
 
 
-
+# Login
 def login(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -31,6 +31,7 @@ def login(request: HttpRequest) -> HttpResponse:
     return render(request, 'login/login.html', {'form': LoginForm()})
 
 
+# Register new user
 def register(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -56,6 +57,7 @@ def register(request: HttpRequest) -> HttpResponse:
     return render(request, 'login/register.html', {'form': RegistrationForm()})
 
 
+# Logout user
 def logout(request: HttpRequest) -> HttpResponse:
     django_login(request, None)
     return redirect('login')
